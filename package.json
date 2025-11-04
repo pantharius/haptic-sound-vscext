@@ -2,7 +2,7 @@
   "name": "haptic-sound-vscext",
   "displayName": "Haptic Sound",
   "description": "Enhance your VS Code typing experience with haptic sound effects.",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "publisher": "pantharius",
   "engines": {
     "vscode": "^1.98.0"
@@ -65,12 +65,12 @@
         }
       }
     },
-    "commands": {
-      "hapticsound.toggle": {
+    "commands": [
+      {
         "command": "hapticsound.toggle",
         "title": "Toggle Haptic Sounds"
       }
-    }
+    ]
   },
   "scripts": {
     "lint": "eslint .",
