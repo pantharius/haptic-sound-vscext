@@ -2,7 +2,7 @@
   "name": "haptic-sound-vscext",
   "displayName": "Haptic Sound",
   "description": "Enhance your VS Code typing experience with haptic sound effects.",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "publisher": "pantharius",
   "engines": {
     "vscode": "^1.98.0"
@@ -50,18 +50,18 @@
         },
         "hapticsound.keySound": {
           "type": "string",
-          "default": "",
-          "description": "Path to the sound file for typing keys."
+          "default": "typewriter",
+          "description": "Sound theme name (e.g. 'typewriter') or a path to a .wav file for typing keys."
         },
         "hapticsound.backspaceSound": {
           "type": "string",
-          "default": "",
-          "description": "Path to the sound file for backspace/delete."
+          "default": "typewriter",
+          "description": "Sound theme name (e.g. 'typewriter') or a path to a .wav file for backspace/delete."
         },
         "hapticsound.saveSound": {
           "type": "string",
-          "default": "",
-          "description": "Path to the sound file for saving files (e.g., carriage return)."
+          "default": "typewriter",
+          "description": "Sound theme name (e.g. 'typewriter') or a path to a .wav file for saving files."
         }
       }
     },

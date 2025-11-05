@@ -1,0 +1,22 @@
+{
+  "typewriter": {
+    "key": "sounds/key.wav",
+    "backspace": "sounds/key.wav",
+    "save": "sounds/carriage-return.wav"
+  },
+  "blaster": {
+    "key": "sounds/blaster/blasterShot.mp3",
+    "backspace": "sounds/blaster/blasterShotEmpty.mp3",
+    "save": "sounds/blaster/blasterReload.mp3"
+  },
+  "gun": {
+    "key": "sounds/gun/gunShot.mp3",
+    "backspace": "sounds/gun/gunShotEmpty.mp3",
+    "save": "sounds/gun/gunReload.mp3"
+  },
+  "bird": {
+    "key": "sounds/bird/birdKey.wav",
+    "backspace": "sounds/bird/birdKey.wav",
+    "save": "sounds/bird/birdSing.wav"
+  }
+}

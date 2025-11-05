@@ -9,19 +9,102 @@ let gainNode = audioContext.createGain();
 gainNode.connect(audioContext.destination);
 
 /**
+ * Determine if a string looks like a path to a file.
+ */
+function isLikelyPath(value) {
+  if (!value || typeof value !== "string") return false;
+  return (
+    value.endsWith(".wav") ||
+    value.endsWith(".mp3") ||
+    value.startsWith("/") ||
+    value.startsWith("./") ||
+    value.startsWith("../") ||
+    value.includes(path.sep)
+  );
+}
+
+/**
+ * Load themes mapping from themes.json if present, otherwise use defaults.
+ */
+let themesCache = null;
+function getThemesMap() {
+  if (themesCache) return themesCache;
+
+  const basePath = path.join(__dirname, "sounds");
+  const themesJsonPath = path.join(__dirname, "themes.json");
+  try {
+    if (fs.existsSync(themesJsonPath)) {
+      const raw = fs.readFileSync(themesJsonPath, "utf8");
+      const parsed = JSON.parse(raw);
+      // Normalize relative paths to absolute
+      const normalized = {};
+      for (const [themeName, mapping] of Object.entries(parsed)) {
+        normalized[themeName.toLowerCase()] = {
+          key: path.isAbsolute(mapping.key)
+            ? mapping.key
+            : path.join(__dirname, mapping.key),
+          backspace: path.isAbsolute(mapping.backspace)
+            ? mapping.backspace
+            : path.join(__dirname, mapping.backspace),
+          save: path.isAbsolute(mapping.save)
+            ? mapping.save
+            : path.join(__dirname, mapping.save),
+        };
+      }
+      themesCache = normalized;
+      return themesCache;
+    }
+  } catch (e) {
+    console.error(`Failed to load themes.json: ${e.message}`);
+  }
+
+  // Fallback defaults if no JSON or failed to parse
+  themesCache = {
+    typewriter: {
+      key: path.join(basePath, "key.wav"),
+      backspace: path.join(basePath, "key.wav"),
+      save: path.join(basePath, "carriage-return.wav"),
+    },
+  };
+  return themesCache;
+}
+
+/**
+ * Resolve a sound setting which can be a theme name or a file path.
+ * kind: "key" | "backspace" | "save"
+ */
+function resolveSound(kind, configured) {
+  const basePath = path.join(__dirname, "sounds");
+
+  // If configured as a path, return absolute path (resolve relative to extension root)
+  if (isLikelyPath(configured)) {
+    return path.isAbsolute(configured)
+      ? configured
+      : path.join(__dirname, configured);
+  }
+
+  // Theme mapping – default 'typewriter'
+  const theme = (configured || "typewriter").toLowerCase();
+  const themeFileMap = getThemesMap();
+
+  if (themeFileMap[theme] && themeFileMap[theme][kind]) {
+    return themeFileMap[theme][kind];
+  }
+
+  // Fallback to typewriter if unknown theme
+  return themeFileMap.typewriter[kind];
+}
+
+/**
  * Load user configuration from settings
  */
 function getConfig() {
   const config = vscode.workspace.getConfiguration("hapticsound");
-  const basePath = path.join(__dirname, "sounds");
-
   return {
     enabled: config.get("enabled") !== false, // Default to true
-    keySound: config.get("keySound") || path.join(basePath, "key.wav"),
-    backspaceSound:
-      config.get("backspaceSound") || path.join(basePath, "key.wav"),
-    saveSound:
-      config.get("saveSound") || path.join(basePath, "carriage-return.wav"),
+    keySound: resolveSound("key", config.get("keySound")),
+    backspaceSound: resolveSound("backspace", config.get("backspaceSound")),
+    saveSound: resolveSound("save", config.get("saveSound")),
   };
 }
 
@@ -43,6 +126,13 @@ async function playSound(filePath) {
     const source = audioContext.createBufferSource();
     source.buffer = audioBuffer;
     source.connect(gainNode); // Connect to gain node instead of directly to destination
+
+    // Apply slight random pitch variation to avoid repetitive sound
+    // Playback rate around 1.0 +/- ~40%
+    const min = 0.6;
+    const max = 1.4;
+    source.playbackRate.value = Math.random() * (max - min) + min;
+
     source.start();
   } catch (error) {
     console.error(`Sound error: ${error.message}`);
@@ -134,7 +224,19 @@ function activate(context) {
 }
 
 function deactivate() {
-  if (audioContext) audioContext.close();
+  try {
+    if (audioContext && typeof audioContext.close === "function") {
+      audioContext.close();
+    }
+  } catch (e) {
+    // Ignore shutdown errors
+  }
 }
 
-module.exports = { activate, deactivate };
+module.exports = {
+  activate,
+  deactivate,
+  resolveSound,
+  getThemesMap,
+  isLikelyPath,
+};
