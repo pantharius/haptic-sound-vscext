@@ -100,11 +100,41 @@ function resolveSound(kind, configured) {
  */
 function getConfig() {
   const config = vscode.workspace.getConfiguration("hapticsound");
+  const themeConfig = config.get("theme");
+
+  let keySound, backspaceSound, saveSound;
+
+  // Check if theme parameter is configured
+  if (themeConfig !== undefined) {
+    // Test if theme is a string or an object
+    if (typeof themeConfig === "string") {
+      // If it's a string, use it as theme name for all sounds
+      keySound = resolveSound("key", themeConfig);
+      backspaceSound = resolveSound("backspace", themeConfig);
+      saveSound = resolveSound("save", themeConfig);
+    } else if (typeof themeConfig === "object" && themeConfig !== null) {
+      // If it's an object, use the individual properties
+      keySound = resolveSound("key", themeConfig.key);
+      backspaceSound = resolveSound("backspace", themeConfig.backspace);
+      saveSound = resolveSound("save", themeConfig.save);
+    } else {
+      // Fallback to default if theme is invalid
+      keySound = resolveSound("key", "typewriter");
+      backspaceSound = resolveSound("backspace", "typewriter");
+      saveSound = resolveSound("save", "typewriter");
+    }
+  } else {
+    // Fallback to legacy individual settings for backward compatibility
+    keySound = resolveSound("key", "typewriter");
+    backspaceSound = resolveSound("backspace", "typewriter");
+    saveSound = resolveSound("save", "typewriter");
+  }
+
   return {
     enabled: config.get("enabled") !== false, // Default to true
-    keySound: resolveSound("key", config.get("keySound")),
-    backspaceSound: resolveSound("backspace", config.get("backspaceSound")),
-    saveSound: resolveSound("save", config.get("saveSound")),
+    keySound,
+    backspaceSound,
+    saveSound,
   };
 }
 

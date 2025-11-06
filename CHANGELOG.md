@@ -8,3 +8,4 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 - init: 🎉 initial commit
 - feat: ✨ add toogle and volume commands and properties
+- feat: ✨ add theme for sounds

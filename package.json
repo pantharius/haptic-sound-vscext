@@ -2,7 +2,7 @@
   "name": "haptic-sound-vscext",
   "displayName": "Haptic Sound",
   "description": "Enhance your VS Code typing experience with haptic sound effects.",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "publisher": "pantharius",
   "engines": {
     "vscode": "^1.98.0"
@@ -48,20 +48,41 @@
           "maximum": 100,
           "description": "Volume level for haptic sound effects (0-100)."
         },
-        "hapticsound.keySound": {
-          "type": "string",
+        "hapticsound.theme": {
+          "type": [
+            "string",
+            "object"
+          ],
+          "oneOf": [
+            {
+              "type": "string",
+              "description": "Sound theme name (e.g. 'typewriter')"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "key": {
+                  "type": "string",
+                  "description": "Sound theme name or path to a .wav file for typing keys."
+                },
+                "backspace": {
+                  "type": "string",
+                  "description": "Sound theme name or path to a .wav file for backspace/delete."
+                },
+                "save": {
+                  "type": "string",
+                  "description": "Sound theme name or path to a .wav file for saving files."
+                }
+              },
+              "required": [
+                "key",
+                "backspace",
+                "save"
+              ]
+            }
+          ],
           "default": "typewriter",
-          "description": "Sound theme name (e.g. 'typewriter') or a path to a .wav file for typing keys."
-        },
-        "hapticsound.backspaceSound": {
-          "type": "string",
-          "default": "typewriter",
-          "description": "Sound theme name (e.g. 'typewriter') or a path to a .wav file for backspace/delete."
-        },
-        "hapticsound.saveSound": {
-          "type": "string",
-          "default": "typewriter",
-          "description": "Sound theme name (e.g. 'typewriter') or a path to a .wav file for saving files."
+          "description": "Sound theme configuration. Can be a theme name (string) or an object with custom sounds for key, backspace, and save."
         }
       }
     },
